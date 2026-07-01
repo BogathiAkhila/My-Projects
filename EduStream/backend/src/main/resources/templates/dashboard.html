@@ -1,0 +1,231 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduStream - Executive Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-slate-50 min-h-screen font-sans text-slate-800">
+
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-40 px-8 py-4 flex justify-between items-center shadow-xs">
+        <div class="flex items-center gap-3">
+            <span class="text-2xl font-black text-indigo-600 tracking-tight">EduStream</span>
+            <span class="bg-indigo-50 text-indigo-700 text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">Enterprise v2.5</span>
+        </div>
+        <div class="flex items-center gap-6">
+            <div class="text-right">
+                <p class="text-sm font-bold text-slate-800">Dr. John Doe</p>
+                <p class="text-xs text-slate-500 font-medium">Lead System Architect</p>
+            </div>
+            <a href="/logout" class="text-xs font-bold bg-rose-50 text-rose-600 px-4 py-2 rounded-xl hover:bg-rose-100 transition">Logout Account</a>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto mt-10 px-4 pb-16">
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Managed Courses</p>
+                    <p class="text-3xl font-black text-slate-800 mt-1" id="courseCount">0</p>
+                </div>
+                <span class="text-3xl p-3 bg-indigo-50 rounded-xl">📚</span>
+            </div>
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Database Engine</p>
+                    <p class="text-sm font-bold text-emerald-600 mt-2 flex items-center gap-1.5">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span> MySQL Connected
+                    </p>
+                </div>
+                <span class="text-3xl p-3 bg-emerald-50 rounded-xl">🛢️</span>
+            </div>
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Active Enrolled Students</p>
+                    <p class="text-3xl font-black text-slate-800 mt-1">14,280</p>
+                </div>
+                <span class="text-3xl p-3 bg-amber-50 rounded-xl">🎓</span>
+            </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs mb-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>
+                <h2 class="text-xl font-bold text-slate-800">Syllabus Allocation Management</h2>
+                <p class="text-slate-500 text-sm mt-0.5">Real-time data synchronization with your local database server instance.</p>
+            </div>
+            <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+                <input type="text" id="searchInput" onkeyup="filterCourses()" placeholder="Search catalog details..." 
+                       class="w-full md:w-64 px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm bg-slate-50">
+                
+                <button onclick="toggleFormModal(true)" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm px-5 py-2.5 rounded-xl transition shadow-md shadow-indigo-100 flex items-center justify-center gap-2 whitespace-nowrap">
+                    <span>➕</span> Add New Course
+                </button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="courseGrid"></div>
+    </main>
+
+    <div id="formModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-200 transform transition-all">
+            <div class="p-5 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+                <h3 class="font-bold text-slate-800 text-lg">Deploy New Database Entity</h3>
+                <button onclick="toggleFormModal(false)" class="text-slate-400 hover:text-slate-600 font-bold text-xl px-2.5 py-1 bg-slate-200 rounded-lg">&times;</button>
+            </div>
+            <form id="newCourseForm" onsubmit="submitCourse(event)" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Course Title</label>
+                    <input type="text" id="formTitle" required placeholder="e.g., Advanced Microservice Patterns" 
+                           class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Syllabus Overview / Description</label>
+                    <textarea id="formDescription" required rows="3" placeholder="Describe the course content and target learning outcomes..." 
+                              class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">YouTube Video ID (Banner Reference)</label>
+                    <input type="text" id="formBannerUrl" required placeholder="e.g., dQw4w9WgXcQ (11 Characters)" 
+                           class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-mono">
+                    <p class="text-[11px] text-slate-400 mt-1">Provide the string value found right after the <code>?v=</code> parameters in a YouTube link address.</p>
+                </div>
+                <div class="pt-2 flex justify-end gap-3 border-t border-slate-100 mt-5">
+                    <button type="button" onclick="toggleFormModal(false)" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-sm font-medium transition">Cancel</button>
+                    <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-bold transition shadow-md shadow-indigo-100">Commit to MySQL</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="videoModal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden relative border border-slate-100">
+            <div class="p-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+                <h3 id="modalTitle" class="font-bold text-slate-800 text-base">Streaming Sandbox Presentation</h3>
+                <button onclick="closeVideo()" class="text-slate-400 hover:text-slate-600 font-bold text-xl px-3 py-1 bg-slate-200 rounded-lg">&times;</button>
+            </div>
+            <div class="aspect-video w-full bg-black">
+                <iframe id="videoPlayer" class="w-full h-full" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let courseData = [];
+
+        // READ Action: Fetch rows from the database endpoint on system load
+        async function fetchDashboardContent() {
+            try {
+                const response = await fetch('/api/courses');
+                courseData = await response.json();
+                document.getElementById('courseCount').innerText = courseData.length;
+                renderCourses(courseData);
+            } catch (error) {
+                console.error("Critical API data sync exception:", error);
+            }
+        }
+
+        // CREATE Action: Package user inputs and issue a POST command
+        async function submitCourse(event) {
+            event.preventDefault(); // Stop page from submitting natively
+            
+            const payload = {
+                title: document.getElementById('formTitle').value,
+                description: document.getElementById('formDescription').value,
+                bannerUrl: document.getElementById('formBannerUrl').value
+            };
+
+            try {
+                const response = await fetch('/api/courses', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    // Reset input form values and close modal interface container window
+                    document.getElementById('newCourseForm').reset();
+                    toggleFormModal(false);
+                    // Re-fetch all elements to natively populate the newest rows instantly
+                    await fetchDashboardContent();
+                } else {
+                    alert("System write exception encountered while saving record to database.");
+                }
+            } catch (error) {
+                console.error("Network communication failure:", error);
+            }
+        }
+
+        // Render card layouts inside the UI view layout grid
+        function renderCourses(list) {
+            const grid = document.getElementById('courseGrid');
+            grid.innerHTML = '';
+            
+            if(list.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-400 font-medium">No courses found matching your query string.</div>`;
+                return;
+            }
+
+            list.forEach(course => {
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between";
+                card.innerHTML = `
+                    <div>
+                        <div class="h-44 bg-slate-900 relative flex items-center justify-center overflow-hidden group">
+                            <img src="https://img.youtube.com/vi/${course.bannerUrl}/maxresdefault.jpg" class="w-full h-full object-cover opacity-80 group-hover:scale-105 transition duration-500" onerror="this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600'">
+                            <button onclick="openVideo('${course.bannerUrl}', '${course.title}')" class="absolute w-12 h-12 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full flex items-center justify-center shadow-xl transition transform hover:scale-110">
+                                <svg class="w-5 h-5 fill-current ml-0.5" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                            </button>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="bg-indigo-50 text-indigo-600 text-xs font-bold px-2.5 py-1 rounded-md">ID: #${course.id}</span>
+                                <span class="bg-slate-100 text-slate-600 text-xs font-semibold px-2.5 py-1 rounded-md">Active Course Matrix</span>
+                            </div>
+                            <h3 class="font-bold text-slate-800 text-base leading-snug mb-2">${course.title}</h3>
+                            <p class="text-slate-500 text-sm leading-relaxed">${course.description}</p>
+                        </div>
+                    </div>
+                    <div class="p-6 pt-0 border-t border-slate-100 mt-4 flex items-center justify-between text-xs text-slate-400">
+                        <span>Stored Entity Ref: Row #${course.id}</span>
+                        <span class="font-semibold text-indigo-600 hover:underline cursor-pointer" onclick="openVideo('${course.bannerUrl}', '${course.title}')">Watch Video &rarr;</span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Live Search Filtering Engine
+        function filterCourses() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = courseData.filter(course => 
+                course.title.toLowerCase().includes(query) || 
+                course.description.toLowerCase().includes(query)
+            );
+            renderCourses(filtered);
+        }
+
+        // Modal View State Management Handlers
+        function toggleFormModal(show) {
+            const modal = document.getElementById('formModal');
+            if (show) modal.classList.remove('hidden');
+            else modal.classList.add('hidden');
+        }
+
+        function openVideo(youtubeId, title) {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('videoPlayer').src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1`;
+            document.getElementById('videoModal').classList.remove('hidden');
+        }
+
+        function closeVideo() {
+            document.getElementById('videoModal').classList.add('hidden');
+            document.getElementById('videoPlayer').src = '';
+        }
+
+        // Initialize execution setup instantly on system bootup context window load
+        window.onload = fetchDashboardContent;
+    </script>
+</body>
+</html>
