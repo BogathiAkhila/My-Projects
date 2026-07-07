@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animated Weather Companion</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        /* Pulse animation for the animal avatar wrapper */
+        @keyframes bounce-gentle {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        .animate-animal {
+            animation: bounce-gentle 3s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body id="bgBody" class="bg-slate-900 min-h-screen flex items-center justify-center p-4 transition-colors duration-700 font-sans">
+
+    <div class="bg-white/10 backdrop-blur-xl p-8 rounded-3xl shadow-2xl w-full max-w-md border border-white/20 text-white text-center transition-all duration-500">
+        <h1 class="text-3xl font-extrabold mb-6 tracking-wide drop-shadow-md">Weather Buddy</h1>
+        
+        <div class="flex flex-col gap-3 sm:flex-row sm:gap-2 mb-8">
+            <input 
+                type="text" 
+                id="cityInput" 
+                placeholder="Enter city name..." 
+                class="flex-1 px-5 py-3.5 rounded-2xl bg-black/20 border border-white/20 placeholder-white/50 text-white focus:outline-none focus:ring-2 focus:ring-cyan-400 text-lg transition-all"
+            >
+            <button 
+                id="searchBtn" 
+                class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-6 py-3.5 rounded-2xl transition duration-300 transform active:scale-95 text-lg shadow-lg shadow-cyan-500/20"
+            >
+                Search
+            </button>
+        </div>
+
+        <p id="message" class="text-sm text-cyan-200 font-medium hidden mb-4"></p>
+
+        <div id="weatherCard" class="hidden space-y-6">
+            
+            <div>
+                <h2 id="cityName" class="text-3xl font-bold tracking-tight">---</h2>
+                <p id="description" class="text-sm uppercase tracking-widest text-white/70 mt-1">---</p>
+            </div>
+
+            <div id="animalContainer" class="w-40 h-40 mx-auto rounded-full bg-white/10 border-2 border-white/20 flex items-center justify-center text-7xl shadow-inner animate-animal transition-all duration-500">
+                🦊
+            </div>
+
+            <div class="flex justify-center items-baseline">
+                <span id="temperature" class="text-7xl font-black tracking-tighter">0</span>
+                <span class="text-3xl font-light ml-1">°C</span>
+            </div>
+
+            <div class="bg-black/20 rounded-2xl p-4 border border-white/10">
+                <p class="text-xs uppercase font-semibold text-cyan-300 tracking-wider mb-1">Buddy's Suggestion</p>
+                <p id="suggestionText" class="text-base font-medium leading-relaxed">---</p>
+            </div>
+            
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
