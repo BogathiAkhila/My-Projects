@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qikro · Ops Admin Panel & Notification Engine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 flex h-screen overflow-hidden">
+
+    <!-- Sidebar / Navigation -->
+    <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between">
+        <div>
+            <div class="p-6 border-b border-slate-800 flex items-center justify-between">
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                        <span class="bg-indigo-600 text-white p-1 rounded text-xs font-mono">Q2</span> Qikro Ops
+                    </h1>
+                    <p class="text-xs text-slate-400 mt-1">Admin & Notification Plane</p>
+                </div>
+            </div>
+            
+            <nav class="p-4 space-y-1">
+                <a href="#" onclick="switchTab('dashboard')" id="nav-dashboard" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium bg-indigo-600 text-white transition-colors">
+                    <i class="fa-solid fa-chart-pie w-5"></i> Dashboard / KPIs
+                </a>
+                <a href="#" onclick="switchTab('orders')" id="nav-orders" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
+                    <i class="fa-solid fa-boxes-stacked w-5"></i> Orders Queue
+                </a>
+                <a href="#" onclick="switchTab('disputes')" id="nav-disputes" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
+                    <i class="fa-solid fa-triangle-exclamation w-5"></i> Disputes & Support
+                </a>
+                <a href="#" onclick="switchTab('notifications')" id="nav-notifications" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
+                    <i class="fa-solid fa-bell w-5"></i> Notification Log
+                </a>
+                <a href="#" onclick="switchTab('audit')" id="nav-audit" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
+                    <i class="fa-solid fa-shield-halved w-5"></i> Immutable Audit Log
+                </a>
+            </nav>
+        </div>
+
+        <!-- Role Switcher -->
+        <div class="p-4 border-t border-slate-800 bg-slate-900/50">
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">RBAC Role Context</label>
+            <select id="roleSelector" class="w-full bg-slate-800 border border-slate-700 text-xs rounded-md p-2 text-slate-200 focus:outline-none focus:border-indigo-500">
+                <option value="admin">admin (Founder / Superuser)</option>
+                <option value="ops_lead">ops_lead (Escalations & Cancels)</option>
+                <option value="finance">finance (Refunds & Settlement)</option>
+                <option value="ops_agent" selected>ops_agent (Standard Ops)</option>
+            </select>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col overflow-y-auto bg-slate-950">
+        
+        <!-- Top Header Bar -->
+        <header class="h-16 border-b border-slate-800 px-8 flex items-center justify-between bg-slate-900/40 backdrop-blur sticky top-0 z-10">
+            <div class="flex items-center gap-4">
+                <h2 id="pageTitle" class="text-lg font-semibold text-white">Operations Dashboard</h2>
+                <span class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">MySQL Connected</span>
+            </div>
+            <div class="flex items-center gap-4 text-sm text-slate-400">
+                <span class="bg-slate-800 px-3 py-1 rounded text-xs text-slate-300"><i class="fa-solid fa-location-dot mr-1 text-indigo-400"></i> Cluster: Hyderabad-C01</span>
+                <span id="currentTime" class="font-mono text-xs"></span>
+            </div>
+        </header>
+
+        <!-- Content Views Container -->
+        <div class="p-8 flex-1">
+
+            <!-- 1. DASHBOARD VIEW -->
+            <section id="view-dashboard" class="space-y-6">
+                <!-- KPI Widgets Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl shadow-sm relative overflow-hidden">
+                        <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Active Retailers (WAOR)</p>
+                        <h3 class="text-3xl font-bold text-white mt-2">1,420</h3>
+                        <p class="text-xs text-emerald-400 mt-4"><i class="fa-solid fa-arrow-trend-up"></i> +12.4% vs last week</p>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl shadow-sm relative overflow-hidden">
+                        <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Fill Rate (Line-Item)</p>
+                        <h3 class="text-3xl font-bold text-white mt-2">94.8%</h3>
+                        <p class="text-xs text-emerald-400 mt-4"><i class="fa-solid fa-circle-check"></i> Target > 90.0%</p>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl shadow-sm relative overflow-hidden">
+                        <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">30-Day Repeat Rate</p>
+                        <h3 class="text-3xl font-bold text-white mt-2">68.2%</h3>
+                        <p class="text-xs text-purple-400 mt-4"><i class="fa-solid fa-bullseye"></i> Cohort baseline stable</p>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl shadow-sm relative overflow-hidden">
+                        <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Contribution per Order</p>
+                        <h3 class="text-3xl font-bold text-white mt-2">₹142.50</h3>
+                        <p class="text-xs text-amber-400 mt-4"><i class="fa-solid fa-triangle-exclamation"></i> 2.1% negative orders</p>
+                    </div>
+                </div>
+
+                <!-- Exception Queues -->
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-base font-semibold text-white">Live Exception Queues</h3>
+                        <span class="text-xs bg-red-500/10 text-red-400 px-2 py-1 rounded font-mono">Real-time alerts</span>
+                    </div>
+                    <div class="space-y-3">
+                        <div onclick="openOrder('ORD-9421')" class="p-3 bg-slate-950/60 border border-slate-800 rounded-lg flex items-center justify-between cursor-pointer hover:border-indigo-500">
+                            <div class="flex items-center gap-3">
+                                <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
+                                <div>
+                                    <p class="text-sm font-medium text-white">ORD-9421 &bull; Sri Venkateswara General Store</p>
+                                    <p class="text-xs text-slate-400">Dispatched past ETA (+45m) &bull; Supplier: Metro Wholesale</p>
+                                </div>
+                            </div>
+                            <span class="text-xs bg-red-500/10 text-red-400 px-2.5 py-1 rounded">SLA Breached</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. ORDERS LIST VIEW -->
+            <section id="view-orders" class="space-y-6 hidden">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-base font-semibold text-white">Orders Working Queue</h3>
+                    <button onclick="loadOrders()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-medium">Refresh Orders</button>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-800 text-xs font-semibold text-slate-400 bg-slate-950/50 uppercase tracking-wider">
+                                <th class="p-4">Order ID</th>
+                                <th class="p-4">Retailer</th>
+                                <th class="p-4">Supplier</th>
+                                <th class="p-4">Value</th>
+                                <th class="p-4">States (Order / Payment / Delivery)</th>
+                                <th class="p-4">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orders-table-body" class="divide-y divide-slate-800 text-sm">
+                            <tr><td colspan="6" class="p-6 text-center text-slate-400">Loading orders from MySQL...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 3. ORDER DETAIL VIEW (SINGLE SOURCE OF TRUTH) -->
+            <section id="view-order-detail" class="space-y-6 hidden">
+                <button onclick="switchTab('orders')" class="text-xs text-indigo-400 hover:underline flex items-center gap-1 font-medium">
+                    <i class="fa-solid fa-arrow-left"></i> Back to Orders Queue
+                </button>
+
+                <div class="space-y-6">
+                    <!-- Panel A: Header -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl p-6">
+                        <div class="flex justify-between items-start border-b border-slate-800 pb-4 mb-4">
+                            <div>
+                                <h3 id="detail-order-id" class="text-lg font-bold text-white flex items-center gap-3">ORD-9421</h3>
+                                <p id="detail-retailer" class="text-xs text-slate-400 mt-1">Retailer: Sri Venkateswara General Store</p>
+                            </div>
+                            <div class="flex gap-2 font-mono text-xs">
+                                <span class="px-3 py-1 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">order: dispatched</span>
+                                <span class="px-3 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">payment: captured</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Panel B: Items -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl p-6">
+                        <h4 class="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Items & Fulfillment Truth</h4>
+                        <p class="text-xs text-slate-400">Aashirvaad Atta 10kg (5 units ordered, 5 delivered) &bull; Fortune Oil 1L (10 units)</p>
+                    </div>
+
+                    <!-- Panel C: Money -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl p-6">
+                        <h4 class="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Money & Server Reconciliation Check</h4>
+                        <div class="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-xs text-emerald-400">
+                            <i class="fa-solid fa-circle-check"></i> Server Reconciliation Verified: Captured − Refunded = Expected Net. Zero Mismatch.
+                        </div>
+                    </div>
+
+                    <!-- Panel D: Delivery -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl p-6">
+                        <h4 class="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Delivery & Driver Tracking</h4>
+                        <p class="text-xs text-slate-400">Assigned Driver: Ramesh K. (+91 99887 XXXXX) &bull; ETA: On Track</p>
+                    </div>
+
+                    <!-- Panel E: Timeline -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl p-6">
+                        <h4 class="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Unified Timeline (Immutable Audit Trail)</h4>
+                        <p class="text-xs font-mono text-slate-400">[10:32 AM] order.placed &rarr; [11:05 AM] order.dispatched</p>
+                    </div>
+
+                    <!-- Panel F: Disputes -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl p-6">
+                        <h4 class="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Support & Disputes</h4>
+                        <button onclick="alert('Ticket raised successfully on behalf of retailer.')" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-3 py-1.5 rounded">Raise Ticket on Behalf</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. DISPUTES QUEUE -->
+            <section id="view-disputes" class="space-y-6 hidden">
+                <h3 class="text-base font-semibold text-white">Disputes & Support Queue</h3>
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 text-sm text-slate-400">
+                    No active SLA-breached disputes currently pending.
+                </div>
+            </section>
+
+            <!-- 5. NOTIFICATION LOG -->
+            <section id="view-notifications" class="space-y-6 hidden">
+                <h3 class="text-base font-semibold text-white">Notification Dispatch Log & Fan-out Engine</h3>
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 text-xs font-mono text-slate-300 space-y-2">
+                    <p>[FCM Push] order.dispatched &rarr; Retailer (Delivered successfully)</p>
+                    <p>[In-App] payment.succeeded &rarr; Retailer (Delivered successfully)</p>
+                </div>
+            </section>
+
+            <!-- 6. AUDIT LOG -->
+            <section id="view-audit" class="space-y-6 hidden">
+                <h3 class="text-base font-semibold text-white">Immutable Admin Audit Trail</h3>
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 text-xs font-mono text-slate-300">
+                    <p>admin_action logged: FORCE_REVIEW on ORD-9421 by akhil</p>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Script -->
+    <script>
+        setInterval(() => {
+            document.getElementById('currentTime').innerText = new Date().toLocaleTimeString();
+        }, 1000);
+
+        function switchTab(tabId) {
+            ['dashboard', 'orders', 'order-detail', 'disputes', 'notifications', 'audit'].forEach(t => {
+                document.getElementById(`view-${t}`).classList.add('hidden');
+                const nav = document.getElementById(`nav-${t}`);
+                if(nav) { nav.className = "flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"; }
+            });
+            document.getElementById(`view-${tabId}`).classList.remove('hidden');
+            const activeNav = document.getElementById(`nav-${tabId}`);
+            if(activeNav) { activeNav.className = "flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium bg-indigo-600 text-white transition-colors"; }
+        }
+
+        async function loadOrders() {
+            try {
+                const res = await fetch('/api/orders');
+                const orders = await res.json();
+                const tbody = document.getElementById('orders-table-body');
+                if (!orders.length) {
+                    tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400">No orders found in database.</td></tr>`;
+                    return;
+                }
+                tbody.innerHTML = orders.map(o => `
+                    <tr class="hover:bg-slate-800/50 cursor-pointer" onclick="openOrder('${o.id}')">
+                        <td class="p-4 font-mono text-indigo-400 font-semibold">${o.id}</td>
+                        <td class="p-4 text-white">${o.retailer_name}</td>
+                        <td class="p-4 text-slate-300">${o.supplier_name}</td>
+                        <td class="p-4 font-medium text-white">₹${o.total_amount}</td>
+                        <td class="p-4 font-mono text-xs"><span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400">${o.order_state}</span></td>
+                        <td class="p-4"><button class="text-indigo-400 hover:underline text-xs">Inspect &rarr;</button></td>
+                    </tr>
+                `).join('');
+            } catch(e) {
+                console.error(e);
+            }
+        }
+
+        function openOrder(id) {
+            switchTab('order-detail');
+        }
+
+        loadOrders();
+    </script>
+</body>
+</html>
