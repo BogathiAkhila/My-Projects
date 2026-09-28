@@ -8,7 +8,8 @@
     "mysql2": "^3.9.2"
   },
   "scripts": {
-    "dev": "node -r dotenv/config --watch src/server.js",
-    "migrate": "node -r dotenv/config migrate.js"
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "migrate": "node migrate.js"
   }
 }
